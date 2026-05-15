@@ -1,0 +1,45 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  background: #F8FAFC;
+  color: #0F172A;
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition;
+  }
+  .btn-primary {
+    @apply btn bg-primary text-white hover:bg-primary-light disabled:opacity-50;
+  }
+  .btn-secondary {
+    @apply btn bg-white text-primary ring-1 ring-slate-200 hover:bg-slate-50;
+  }
+  .btn-ghost {
+    @apply btn text-muted hover:bg-slate-100;
+  }
+  .card {
+    @apply rounded-2xl bg-surface shadow-card border border-slate-100;
+  }
+  .input {
+    @apply w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/20;
+  }
+  .label {
+    @apply mb-1.5 block text-xs font-medium text-muted;
+  }
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium;
+  }
+  .badge-draft { @apply badge bg-slate-100 text-slate-600; }
+  .badge-review { @apply badge bg-amber-50 text-warning; }
+  .badge-complete { @apply badge bg-green-50 text-success; }
+}
