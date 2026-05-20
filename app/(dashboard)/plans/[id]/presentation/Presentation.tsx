@@ -10,9 +10,11 @@ interface Props {
   clientAge: number
   advisorName: string
   modules: PlanModule[]
+  backHref?: string
 }
 
-export default function Presentation({ planId, clientName, clientAge, advisorName, modules }: Props) {
+export default function Presentation({ planId, clientName, clientAge, advisorName, modules, backHref }: Props) {
+  const back = backHref ?? `/plans/${planId}/review`
   const deckRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -62,7 +64,7 @@ export default function Presentation({ planId, clientName, clientAge, advisorNam
   return (
     <div className="fixed inset-0 bg-black">
       <Link
-        href={`/plans/${planId}/review`}
+        href={back}
         className="absolute top-4 left-4 z-50 text-white/70 hover:text-white text-sm bg-white/10 backdrop-blur px-3 py-1.5 rounded-full"
       >
         ← Zpět

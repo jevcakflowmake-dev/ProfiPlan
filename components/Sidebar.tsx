@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation'
 import { clsx } from 'clsx'
 
 const NAV = [
-  { href: '/', label: 'Přehled', icon: '◐' },
+  { href: '/dashboard', label: 'Přehled', icon: '◐' },
   { href: '/clients', label: 'Klienti', icon: '◯' },
   { href: '/plans/new', label: 'Nový plán', icon: '＋' },
 ]
@@ -19,7 +19,7 @@ export default function Sidebar({ advisorName }: { advisorName: string }) {
       </div>
       <nav className="flex-1 px-3">
         {NAV.map((item) => {
-          const active = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href)
+          const active = pathname === item.href || pathname.startsWith(item.href + '/')
           return (
             <Link
               key={item.href}

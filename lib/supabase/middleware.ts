@@ -3,13 +3,33 @@ import { NextResponse, type NextRequest } from 'next/server'
 
 type CookieSetItem = { name: string; value: string; options?: CookieOptions }
 
+const PUBLIC_PATHS = ['/', '/login', '/register', '/demo']
+
+function isPublic(path: string): boolean {
+  if (PUBLIC_PATHS.includes(path)) return true
+  if (path.startsWith('/demo/')) return true
+  if (path.startsWith('/api/health')) return true
+  return false
+}
+
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request })
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  // Pokud chybí env vars — propustíme všechny public routes; dashboard pošleme na /login.
+  if (!url || !anonKey) {
+    if (!isPublic(request.nextUrl.pathname)) {
+      const redirect = request.nextUrl.clone()
+      redirect.pathname = '/login'
+      return NextResponse.redirect(redirect)
+    }
+    return response
+  }
+
+  try {
+    const supabase = createServerClient(url, anonKey, {
       cookies: {
         getAll() {
           return request.cookies.getAll()
@@ -22,25 +42,26 @@ export async function updateSession(request: NextRequest) {
           )
         },
       },
-    },
-  )
+    })
 
-  const { data: { user } } = await supabase.auth.getUser()
+    const { data: { user } } = await supabase.auth.getUser()
 
-  const path = request.nextUrl.pathname
-  const isAuthPage = path.startsWith('/login') || path.startsWith('/register')
-  const isProtected = !isAuthPage && path !== '/' && !path.startsWith('/api/health')
+    const path = request.nextUrl.pathname
+    const authPage = path === '/login' || path === '/register'
 
-  if (!user && isProtected) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/login'
-    url.searchParams.set('next', path)
-    return NextResponse.redirect(url)
-  }
-  if (user && isAuthPage) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/'
-    return NextResponse.redirect(url)
+    if (!user && !isPublic(path) && !authPage) {
+      const redirect = request.nextUrl.clone()
+      redirect.pathname = '/login'
+      redirect.searchParams.set('next', path)
+      return NextResponse.redirect(redirect)
+    }
+    if (user && authPage) {
+      const redirect = request.nextUrl.clone()
+      redirect.pathname = '/dashboard'
+      return NextResponse.redirect(redirect)
+    }
+  } catch (err) {
+    console.error('[middleware] Supabase failure — pouštím request dál.', err)
   }
 
   return response

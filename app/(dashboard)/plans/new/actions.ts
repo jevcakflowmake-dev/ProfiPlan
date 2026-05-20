@@ -46,6 +46,6 @@ export async function createPlan(formData: FormData) {
   const { error: modErr } = await supabase.from('plan_modules').insert(rows)
   if (modErr) return { error: modErr.message }
 
-  revalidatePath('/')
+  revalidatePath('/dashboard')
   redirect(`/plans/${plan.id}`)
 }

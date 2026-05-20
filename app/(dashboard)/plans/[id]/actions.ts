@@ -30,6 +30,6 @@ export async function setPlanStatus(planId: string, status: 'draft' | 'review' |
   if (error) return { error: error.message }
 
   revalidatePath('/plans')
-  revalidatePath('/')
+  revalidatePath('/dashboard')
   return { ok: true }
 }
